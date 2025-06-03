@@ -1,0 +1,14 @@
+Fix Log - Ring Topology Simulator
+
+1. Fixed missing updateNodeVisual function in healRing 
+   - Changed to use the existing updateVisuals function
+   - This was causing an error when running Ring Diagnostics after turning off a node
+
+2. Fixed validation in packet sending
+   - Enhanced canTransmit function to properly check for inactive nodes in both source and target
+   - Added proper check when sending packets to prevent transmission to inactive nodes
+
+These fixes ensure:
+- Ring Diagnostics works correctly
+- Packets can't be sent to broken/closed nodes
+- Better error handling for network validation

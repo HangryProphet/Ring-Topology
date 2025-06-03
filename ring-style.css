@@ -1,0 +1,900 @@
+/* Ring Topology Simulator - JARVIS/Iron Man Theme */
+
+/* JARVIS/Iron Man Theme Variables */
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --bg-panel: #0f1419;
+  --text-primary: #00d4ff;
+  --text-secondary: #87ceeb;
+  --text-accent: #ffffff;
+  --border-primary: #00bfff;
+  --border-secondary: #4682b4;
+  --glow-primary: #00d4ff;
+  --glow-secondary: #87ceeb;
+  --success: #00ff88;
+  --warning: #ffaa00;
+  --danger: #ff4444;
+  --energy: #00d4ff;
+  
+  /* Legacy variable mappings for compatibility */
+  --bg: var(--bg-primary);
+  --card: var(--bg-panel);
+  --text: var(--text-primary);
+  --primary: var(--glow-primary);
+  --secondary: var(--text-secondary);
+  --border: var(--border-primary);
+}
+
+/* JARVIS/Iron Man Theme Variables */
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --bg-panel: #0f1419;
+  --text-primary: #00d4ff;
+  --text-secondary: #87ceeb;
+  --text-accent: #ffffff;
+  --border-primary: #00bfff;
+  --border-secondary: #4682b4;
+  --glow-primary: #00d4ff;
+  --glow-secondary: #87ceeb;
+  --success: #00ff88;
+  --warning: #ffaa00;
+  --danger: #ff4444;
+  --energy: #00d4ff;
+  
+  /* Legacy variable mappings for compatibility */
+  --bg: var(--bg-primary);
+  --card: var(--bg-panel);
+  --text: var(--text-primary);
+  --primary: var(--glow-primary);
+  --secondary: var(--text-secondary);
+  --border: var(--border-primary);
+}
+
+body {
+  font-family: 'Orbitron', 'Courier New', monospace;
+  background: var(--bg-primary);
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary);
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+  font-size: 13px;
+}
+
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  position: fixed;
+  right: 0;
+  top: 0;
+  background: var(--bg-panel);
+  border-left: 2px solid var(--border-primary);
+  padding: 10px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: -5px 0 15px rgba(0, 212, 255, 0.2);
+}
+
+.main-content {
+  flex: 1;
+  margin-right: 240px;
+  margin-top: 0;
+  padding: 0;
+  position: relative;
+}
+
+/* JARVIS Header */
+.jarvis-header {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 2px solid var(--border-primary);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(0, 191, 255, 0.1));
+}
+
+.jarvis-header h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0;
+  text-shadow: 0 0 15px var(--glow-primary);
+  letter-spacing: 3px;
+}
+
+.jarvis-header .subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 5px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+h1 {
+  color: var(--text-primary);
+  font-weight: bold;
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  text-shadow: 0 0 5px var(--glow-primary);
+  border-bottom: 1px solid var(--border-primary);
+  padding-bottom: 10px;
+}
+
+h2 {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 15px 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+h3 {
+  color: var(--text-primary);
+  font-size: 13px;
+  margin: 10px 0 8px 0;
+}
+
+#network {
+  width: 100%;
+  height: 100vh;
+  background: var(--bg-primary);
+  border: none;
+  position: relative;
+  overflow: hidden;
+  margin-left: 135px; 
+}
+
+/* Control Panels */
+.control-panel {
+  margin-bottom: 10px;
+  padding: 8px;
+  background: var(--bg-panel);
+  border: 2px solid var(--border-secondary);
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.1);
+}
+
+.control-panel h2 {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  color: var(--text-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border-secondary);
+  padding-bottom: 4px;
+}
+
+.control-panel h3 {
+  margin: 6px 0 4px 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* JARVIS Buttons */
+.jarvis-btn {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  border: 2px solid var(--border-primary);
+  padding: 10px 16px;
+  margin: 6px 3px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 191, 255, 0.2));
+  color: var(--text-primary);
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.jarvis-btn:hover {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 191, 255, 0.3));
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+.jarvis-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.8);
+}
+
+.jarvis-btn.danger {
+  border-color: var(--danger);
+  background: linear-gradient(135deg, rgba(255, 68, 68, 0.1), rgba(255, 68, 68, 0.2));
+  color: var(--danger);
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+}
+
+.jarvis-btn.danger:hover {
+  background: linear-gradient(135deg, rgba(255, 68, 68, 0.2), rgba(255, 68, 68, 0.3));
+  box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+}
+
+.jarvis-btn.success {
+  border-color: var(--success);
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.2));
+  color: var(--success);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.jarvis-btn.success:hover {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.3));
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+}
+
+button {
+  background: var(--card);
+  color: var(--text);
+  border: 2px solid var(--border);
+  padding: 8px 12px;
+  margin: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+  image-rendering: pixelated;
+}
+
+button:hover {
+  background: var(--primary);
+  color: var(--bg);
+  box-shadow: 0 0 10px var(--primary);
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 0 5px var(--primary);
+}
+
+#resetAll {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: white;
+}
+
+#resetAll:hover {
+  background: #ff5577;
+  box-shadow: 0 0 10px var(--danger);
+}
+
+select {
+  background: var(--card);
+  color: var(--text);
+  border: 2px solid var(--border);
+  padding: 8px;
+  margin: 5px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  width: calc(100% - 10px);
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 5px var(--primary);
+}
+
+/* JARVIS Input Controls */
+.jarvis-select, .jarvis-input {
+  width: 100%;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-secondary);
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.jarvis-select:focus, .jarvis-input:focus {
+  outline: none;
+  border-color: var(--border-primary);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+}
+
+.jarvis-slider {
+  width: 100%;
+  height: 25px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-secondary);
+  border-radius: 6px;
+  outline: none;
+  appearance: none;
+  transition: all 0.3s ease;
+  margin: 8px 0;
+}
+
+.jarvis-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--border-primary);
+  border: 2px solid var(--text-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+  transition: all 0.3s ease;
+}
+
+.jarvis-slider::-webkit-slider-thumb:hover {
+  background: var(--text-primary);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.8);
+}
+
+/* Configuration Items */
+.config-item {
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(15, 20, 25, 0.6);
+  border-radius: 6px;
+  border: 1px solid var(--border-secondary);
+}
+
+.config-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.config-item input[type="checkbox"] {
+  margin-right: 10px;
+  accent-color: var(--border-primary);
+  transform: scale(1.2);
+}
+
+/* Packet Mode Radio Buttons */
+.packet-mode {
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(15, 20, 25, 0.6);
+  border-radius: 6px;
+  border: 1px solid var(--border-secondary);
+}
+
+.packet-mode label {
+  display: inline-block;
+  margin-right: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+.packet-mode label:hover {
+  color: var(--text-primary);
+}
+
+.packet-mode input[type="radio"] {
+  margin-right: 8px;
+  accent-color: var(--border-primary);
+  transform: scale(1.2);
+}
+
+/* Legacy Status Display - Hidden now that we use status boxes */
+.status {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  color: var(--text-primary);
+}
+
+/* Status is now displayed in the status boxes */
+#status, #packetStatus {
+  margin: 0;
+  padding: 0;
+}
+
+.active-connection {
+  color: var(--success);
+  text-shadow: 0 0 5px var(--success);
+}
+
+.inactive-connection {
+  color: var(--danger);
+  text-shadow: 0 0 5px var(--danger);
+}
+
+/* Status Container and Boxes */
+.status-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+  width: 320px;
+}
+
+.status-box {
+  background: var(--bg-panel);
+  border: 2px solid var(--border-primary);
+  border-radius: 6px;
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+  overflow: hidden;
+}
+
+#activityBox {
+  min-height: 280px; /* Increased from 240px for more log display */
+}
+
+.status-box h3 {
+  background: linear-gradient(90deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.1));
+  color: var(--text-primary);
+  margin: 0;
+  padding: 8px 12px;
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.status-details {
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+}
+
+#activityBox {
+  max-height: 200px;
+}
+
+#activityBox .log-container {
+  max-height: 240px; /* Increased from 200px to show more logs */
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 10px;
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* Activity Log */
+.activity-log {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: var(--bg-panel);
+  border: 2px solid var(--border-secondary);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
+}
+
+.activity-log h2 {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  color: var(--text-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border-secondary);
+  padding-bottom: 8px;
+}
+
+.log-container {
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.log-entry {
+  display: flex;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px dotted rgba(0, 212, 255, 0.2);
+}
+
+.log-entry:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.log-time {
+  color: var(--text-secondary);
+  margin-right: 8px;
+  font-size: 9px;
+  min-width: 60px;
+}
+
+.log-entry.info {
+  color: var(--text-primary);
+}
+
+.log-entry.success {
+  color: var(--success);
+}
+
+.log-entry.warning {
+  color: var(--warning);
+}
+
+.log-entry.error {
+  color: var(--danger);
+}
+
+.log-entry.source,
+.log-entry.target {
+  color: var(--energy);
+}
+
+/* Load Test Results */
+.load-test-results {
+  margin-top: 15px;
+  padding: 15px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 6px;
+}
+
+.load-test-results h4 {
+  margin: 0 0 12px 0;
+  color: var(--text-primary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.metric span {
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+/* Legend */
+.legend {
+  margin-top: 20px;
+  padding: 15px;
+  border: 2px solid var(--border-secondary);
+  border-radius: 8px;
+  background: rgba(15, 20, 25, 0.6);
+}
+
+.legend h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: var(--text-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-right: 10px;
+  border: 2px solid;
+}
+
+/* User Guide Overlay */
+.user-guide {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.95);
+  z-index: 2000;
+  display: none;
+  overflow-y: auto;
+  backdrop-filter: blur(5px);
+}
+
+.guide-content {
+  max-width: 700px;
+  margin: 50px auto;
+  padding: 40px;
+  background: var(--bg-panel);
+  border: 2px solid var(--border-primary);
+  border-radius: 12px;
+  box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+  font-family: 'Orbitron', monospace;
+}
+
+.guide-content h2 {
+  color: var(--text-primary);
+  text-align: center;
+  margin: 0 0 30px 0;
+  font-size: 24px;
+  text-shadow: 0 0 15px var(--glow-primary);
+  letter-spacing: 2px;
+}
+
+.guide-content h3 {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin: 25px 0 15px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.guide-content ul, 
+.guide-content ol {
+  padding-left: 25px;
+  color: var(--text-secondary);
+}
+
+.guide-content li {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.guide-content strong {
+  color: var(--text-primary);
+}
+
+.close-guide {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 32px;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+}
+
+.close-guide:hover {
+  color: var(--danger);
+  text-shadow: 0 0 10px var(--danger);
+}
+
+.show-guide {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 50;
+  padding: 6px 12px;
+  font-size: 11px;
+  width: auto;
+  background: rgba(0, 0, 0, 0.8);
+  border-color: var(--border-primary);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+/* Button Group Layout */
+.button-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.button-group .jarvis-btn {
+  flex: 1;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 300px;
+  }
+  .main-content {
+    margin-right: 250px;
+  }
+  .show-guide {
+    right: 320px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+  .main-content {
+    margin-right: 0;
+    height: 60vh;
+  }
+  .main-layout {
+    flex-direction: column;
+  }
+  .show-guide {
+    right: 20px;
+  }
+}
+
+/* Ring-specific animations */
+@keyframes ring-pulse {
+  0% { 
+    box-shadow: 0 0 5px var(--border-primary);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 20px var(--border-primary), 0 0 30px var(--border-primary);
+    transform: scale(1.05);
+  }
+  100% { 
+    box-shadow: 0 0 5px var(--border-primary);
+    transform: scale(1);
+  }
+}
+
+.ring-active {
+  animation: ring-pulse 2s infinite;
+}
+
+/* Token visualization */
+.token {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle, #ffaa00, #ff6600);
+  border: 2px solid var(--warning);
+  border-radius: 50%;
+  box-shadow: 0 0 15px var(--warning);
+  z-index: 1001;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+@keyframes token-glow {
+  0% { box-shadow: 0 0 10px var(--warning); }
+  50% { box-shadow: 0 0 20px var(--warning), 0 0 30px var(--warning); }
+  100% { box-shadow: 0 0 10px var(--warning); }
+}
+
+.token-active {
+  animation: token-glow 1.5s infinite;
+}
+
+/* Packet animations */
+.packet {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle, var(--text-primary), var(--border-primary));
+  border: 2px solid var(--border-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 15px var(--text-primary);
+  z-index: 1000;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+@keyframes packet-pulse {
+  0% { box-shadow: 0 0 15px var(--text-primary); }
+  100% { box-shadow: 0 0 25px var(--text-primary), 0 0 35px var(--border-primary); }
+}
+
+.packet-trail {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(0, 212, 255, 0.6), rgba(0, 153, 204, 0.3));
+  border-radius: 50%;
+  z-index: 999;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: fade-out 0.8s ease-out forwards;
+}
+
+@keyframes fade-out {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+}
+
+/* Collision effects */
+@keyframes collision {
+  0% { 
+    transform: scale(1) rotate(0deg);
+    box-shadow: 0 0 10px var(--danger);
+  }
+  25% { 
+    transform: scale(1.5) rotate(90deg);
+    box-shadow: 0 0 25px var(--danger), 0 0 35px var(--danger);
+  }
+  50% { 
+    transform: scale(1) rotate(180deg);
+    box-shadow: 0 0 10px var(--danger);
+  }
+  75% { 
+    transform: scale(1.5) rotate(270deg);
+    box-shadow: 0 0 25px var(--danger), 0 0 35px var(--danger);
+  }
+  100% { 
+    transform: scale(1) rotate(360deg);
+    box-shadow: 0 0 10px var(--danger);
+  }
+}
+
+.collision-effect {
+  animation: collision 0.8s ease-in-out;
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 20px var(--danger) !important;
+}
+
+/* Network health indicators */
+.network-health-good {
+  color: var(--success);
+  text-shadow: 0 0 5px var(--success);
+}
+
+.network-health-warning {
+  color: var(--warning);
+  text-shadow: 0 0 5px var(--warning);
+}
+
+.network-health-critical {
+  color: var(--danger);
+  text-shadow: 0 0 5px var(--danger);
+}
+
+/* Token control specific styling */
+.token-control {
+  border-color: var(--warning);
+  background: linear-gradient(135deg, rgba(255, 170, 0, 0.05), rgba(255, 170, 0, 0.1));
+}

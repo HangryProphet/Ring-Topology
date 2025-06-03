@@ -1,0 +1,19 @@
+/* Token animation styles */
+@keyframes token-pulse {
+  0% { 
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 15px var(--warning);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 25px var(--warning), 0 0 35px var(--warning);
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 15px var(--warning);
+  }
+}
+
+.token-pulse {
+  animation: token-pulse 0.3s ease-in-out;
+}

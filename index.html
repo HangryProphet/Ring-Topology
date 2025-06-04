@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JARVIS Ring Network Simulator - Stark Industries</title>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="ring-style.css">
+    <link rel="stylesheet" href="css/token-animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+      /* JARVIS/Iron Man Theme Variables */
+      :root {
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #1a1a1a;
+        --bg-panel: #0f1419;
+        --text-primary: #00d4ff;
+        --text-secondary: #87ceeb;
+        --text-accent: #ffffff;
+        --border-primary: #00bfff;
+        --border-secondary: #4682b4;
+        --glow-primary: #00d4ff;
+        --glow-secondary: #87ceeb;
+        --success: #00ff88;
+        --warning: #ffaa00;
+        --danger: #ff4444;
+        --energy: #00d4ff;
+      }
+
+      /* Packet animation styles - JARVIS theme */
+      .packet {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        background: radial-gradient(circle, #00d4ff, #0099cc);
+        border: 2px solid #00bfff;
+        border-radius: 50%;
+        box-shadow: 0 0 15px #00d4ff, inset 0 0 5px rgba(255,255,255,0.4);
+        z-index: 1000;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        animation: packet-pulse 0.8s ease-in-out infinite alternate;
+      }
+      
+      @keyframes packet-pulse {
+        0% { box-shadow: 0 0 15px #00d4ff, inset 0 0 5px rgba(255,255,255,0.4); }
+        100% { box-shadow: 0 0 25px #00d4ff, 0 0 35px #00bfff, inset 0 0 8px rgba(255,255,255,0.6); }
+      }
+      
+      .packet-trail {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: radial-gradient(circle, rgba(0, 212, 255, 0.6), rgba(0, 153, 204, 0.3));
+        border: 1px solid rgba(0, 191, 255, 0.7);
+        border-radius: 50%;
+        z-index: 999;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+      
+      .pulse-effect {
+        animation: jarvis-pulse 0.8s ease-out;
+      }
+      
+      @keyframes jarvis-pulse {
+        0% { 
+          transform: scale(1); 
+          opacity: 1; 
+          box-shadow: 0 0 15px #00d4ff; 
+        }
+        50% {
+          transform: scale(2);
+          opacity: 0.7;
+          box-shadow: 0 0 30px #00d4ff, 0 0 40px #00bfff;
+        }
+        100% { 
+          transform: scale(3); 
+          opacity: 0; 
+          box-shadow: 0 0 50px #00d4ff, 0 0 60px #00bfff; 
+        }
+      }
+
+      /* JARVIS Theme Base */
+      body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: 'Orbitron', 'Courier New', monospace;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
+
+      /* Holographic overlay effect */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+          radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(135, 206, 235, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 40% 80%, rgba(0, 191, 255, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+      }      /* JARVIS UI Components */
+      .main-layout {
+        display: flex;
+        min-height: 100vh;
+        background: var(--bg-primary);
+      }
+
+      .main-content {
+        flex: 1;
+        margin-right: 380px;
+        position: relative;
+        background: var(--bg-primary);
+      }
+
+      .sidebar {
+        width: 380px;
+        height: 100vh;
+        position: fixed;
+        right: 0;
+        top: 0;
+        background: linear-gradient(135deg, var(--bg-panel) 0%, var(--bg-secondary) 100%);
+        border-left: 2px solid var(--border-primary);
+        padding: 20px;
+        overflow-y: auto;
+        z-index: 10;
+        box-shadow: -10px 0 30px rgba(0, 212, 255, 0.2);
+      }
+
+      /* JARVIS Header */
+      .jarvis-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 2px solid var(--border-primary);
+        border-radius: 10px;
+        background: linear-gradient(45deg, rgba(0, 212, 255, 0.1), rgba(135, 206, 235, 0.1));
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+      }
+
+      .jarvis-header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: var(--text-accent);
+        text-shadow: 0 0 10px var(--glow-primary);
+        letter-spacing: 2px;
+      }
+
+      .jarvis-header .subtitle {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Network Display */
+      #network {
+        width: 100%;
+        height: 100vh;
+        background: var(--bg-primary);
+        position: relative;
+      }
+
+      /* Circuit board pattern overlay */
+      #network::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 99px,
+            rgba(0, 212, 255, 0.1) 100px,
+            rgba(0, 212, 255, 0.1) 101px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 99px,
+            rgba(0, 212, 255, 0.1) 100px,
+            rgba(0, 212, 255, 0.1) 101px
+          );
+        pointer-events: none;
+        z-index: 0;
+      }      /* Status Container and Boxes */
+      .status-container {
+        position: fixed;
+        left: 20px;
+        top: 20px;
+        width: 360px;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .status-box {
+        background: rgba(15, 20, 25, 0.9);
+        border: 2px solid var(--border-primary);
+        border-radius: 8px;
+        padding: 12px 15px;
+        color: var(--text-primary);
+        font-family: 'Orbitron', monospace;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .status-box h3 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--text-accent);
+      }
+
+      .status-details {
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
+
+      #activityBox {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      #packetLog {
+        min-height: 220px;
+        max-height: 240px;
+        overflow-y: auto;
+        background: rgba(15, 20, 25, 0.6);
+        border: 1px solid var(--border-secondary);
+        margin-top: 5px;
+        padding: 5px;
+        border-radius: 4px;
+      }
+
+      /* JARVIS Control Panels */
+      .control-panel {
+        margin-bottom: 25px;
+        padding: 20px;
+        border: 2px solid var(--border-secondary);
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(15, 20, 25, 0.8));
+        box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        backdrop-filter: blur(5px);
+      }
+
+      .control-panel h2 {
+        margin: 0 0 15px 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-accent);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 0 0 8px var(--glow-primary);
+      }
+
+      /* JARVIS Buttons */
+      .jarvis-btn {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        border: 2px solid var(--border-primary);
+        border-radius: 6px;
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 191, 255, 0.2));
+        color: var(--text-primary);
+        font-family: 'Orbitron', monospace;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+      }
+
+      .jarvis-btn:hover {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 191, 255, 0.3));
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+        transform: translateY(-2px);
+      }
+
+      .jarvis-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.8);
+      }
+
+      .jarvis-btn.danger {
+        border-color: var(--danger);
+        background: linear-gradient(135deg, rgba(255, 68, 68, 0.1), rgba(255, 68, 68, 0.2));
+        color: var(--danger);
+        box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+      }
+
+      .jarvis-btn.danger:hover {
+        background: linear-gradient(135deg, rgba(255, 68, 68, 0.2), rgba(255, 68, 68, 0.3));
+        box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+      }
+
+      .jarvis-btn.success {
+        border-color: var(--success);
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 136, 0.2));
+        color: var(--success);
+        box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+      }
+
+      .jarvis-btn.success:hover {
+        background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.3));
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+      }
+
+      /* JARVIS Input Controls */
+      .jarvis-select, .jarvis-input {
+        width: 100%;
+        padding: 10px 15px;
+        margin: 8px 0;
+        border: 2px solid var(--border-secondary);
+        border-radius: 6px;
+        background: rgba(15, 20, 25, 0.8);
+        color: var(--text-primary);
+        font-family: 'Orbitron', monospace;
+        font-size: 12px;
+        font-weight: 700;
+        backdrop-filter: blur(5px);
+        box-shadow: inset 0 0 10px rgba(0, 212, 255, 0.2);
+      }
+
+      .jarvis-select:focus, .jarvis-input:focus {
+        outline: none;
+        border-color: var(--border-primary);
+        box-shadow: inset 0 0 10px rgba(0, 212, 255, 0.3), 0 0 15px rgba(0, 212, 255, 0.4);
+      }
+
+      .jarvis-select option {
+        background: var(--bg-panel);
+        color: var(--text-primary);
+      }
+
+      /* Radio buttons */
+      .packet-mode {
+        display: flex;
+        gap: 15px;
+        margin: 15px 0;
+      }
+
+      .packet-mode label {
+        display: flex;
+        align-items: center;
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+      }
+
+      .packet-mode input[type="radio"] {
+        margin-right: 8px;
+        transform: scale(1.2);
+        accent-color: var(--border-primary);
+      }
+
+      /* Token Control Section */
+      .token-control {
+        margin: 20px 0;
+        padding: 15px;
+        border: 2px solid var(--warning);
+        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(255, 170, 0, 0.1), rgba(255, 170, 0, 0.05));
+        box-shadow: 0 0 15px rgba(255, 170, 0, 0.2);
+      }
+
+      .token-control h3 {
+        margin: 0 0 10px 0;
+        color: var(--warning);
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Configuration Sliders */
+      .config-item {
+        margin: 15px 0;
+      }
+
+      .config-item label {
+        display: block;
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+      }
+
+      .jarvis-slider {
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(15, 20, 25, 0.8);
+        outline: none;
+        border: 1px solid var(--border-secondary);
+        box-shadow: inset 0 0 5px rgba(0, 212, 255, 0.2);
+      }
+
+      .jarvis-slider::-webkit-slider-thumb {
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--border-primary);
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+      }
+
+      .jarvis-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--border-primary);
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+      }
+
+      /* Activity Log */
+      .activity-log {
+        margin-top: 20px;
+        padding: 20px;
+        border: 2px solid var(--border-secondary);
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(15, 20, 25, 0.9));
+        box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      .activity-log h2 {
+        margin: 0 0 15px 0;
+        font-size: 16px;
+        color: var(--text-accent);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .log-container {
+        font-size: 11px;
+        line-height: 1.4;
+        max-height: 250px;
+        overflow-y: auto;
+      }
+
+      .log-entry {
+        margin: 5px 0;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border-left: 3px solid var(--border-primary);
+        background: rgba(0, 212, 255, 0.05);
+      }
+
+      .log-entry.info {
+        border-left-color: var(--text-primary);
+        color: var(--text-secondary);
+      }
+
+      .log-entry.success {
+        border-left-color: var(--success);
+        color: var(--success);
+      }
+
+      .log-entry.warning {
+        border-left-color: var(--warning);
+        color: var(--warning);
+      }
+
+      .log-entry.error {
+        border-left-color: var(--danger);
+        color: var(--danger);
+      }
+
+      /* Legend */
+      .legend {
+        margin-top: 20px;
+        padding: 15px;
+        border: 2px solid var(--border-secondary);
+        border-radius: 8px;
+        background: rgba(15, 20, 25, 0.6);
+      }
+
+      .legend h3 {
+        margin: 0 0 10px 0;
+        font-size: 14px;
+        color: var(--text-accent);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        margin: 8px 0;
+        font-size: 11px;
+        color: var(--text-secondary);
+      }
+
+      .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        margin-right: 10px;
+        border: 2px solid;
+      }
+
+      /* User Guide Overlay */
+      .user-guide {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(10px);
+        z-index: 1000;
+        display: none;
+        overflow-y: auto;
+      }
+
+      .guide-content {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 40px;
+        background: linear-gradient(135deg, var(--bg-panel), var(--bg-secondary));
+        border: 2px solid var(--border-primary);
+        border-radius: 15px;
+        box-shadow: 0 0 40px rgba(0, 212, 255, 0.4);
+      }
+
+      .guide-content h2 {
+        color: var(--text-accent);
+        font-size: 28px;
+        text-align: center;
+        margin-bottom: 30px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow: 0 0 15px var(--glow-primary);
+      }      .show-guide {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 100;
+        width: auto;
+        max-width: 170px;
+        padding: 10px 15px;
+        font-size: 12px;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.7);
+        border: 2px solid var(--border-primary);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        transition: all 0.3s ease;
+      }
+      
+      .show-guide:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+        background: rgba(0, 20, 40, 0.8);
+      }
+
+      .close-guide {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        border: 2px solid var(--danger);
+        border-radius: 50%;
+        background: rgba(255, 68, 68, 0.1);
+        color: var(--danger);
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--bg-panel);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-primary);
+        border-radius: 4px;
+        box-shadow: 0 0 5px rgba(0, 212, 255, 0.5);
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-primary);
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+      }
+
+      /* Responsive design */
+      @media (max-width: 1200px) {
+        .sidebar {
+          width: 320px;
+        }
+        
+        .main-content {
+          margin-right: 320px;
+        }
+      }
+    </style>
+  </head>
+  <body>    <!-- JARVIS User Guide Overlay -->
+    <div id="userGuide" class="user-guide">
+      <div class="guide-content">
+        <h2>JARVIS Ring Network Simulator</h2>
+        <button id="closeGuide" class="close-guide">×</button>
+        
+        <h3>🔗 Ring Topology Overview</h3>
+        <p>In a ring topology, devices are connected in a circular pattern where each device connects to exactly two other devices, forming a ring.</p>
+        
+        <h3>⚡ Key Features</h3>
+        <ul>
+          <li><strong>Token Passing:</strong> Data flows in one direction around the ring</li>
+          <li><strong>No Central Hub:</strong> Each device acts as a repeater</li>
+          <li><strong>Deterministic:</strong> Predictable data transmission patterns</li>
+          <li><strong>Fault Tolerance:</strong> Single point of failure can break the ring</li>
+        </ul>
+
+        <h3>🎮 How to Use</h3>
+        <ol>
+          <li>Click on any node to toggle it on/off</li>
+          <li>Select source and target nodes for packet transmission</li>
+          <li>Choose between unicast and broadcast modes</li>
+          <li>Watch packets travel around the ring</li>
+          <li>Monitor traffic patterns and collision detection</li>
+        </ol>
+
+        <h3>🔧 Advanced Features</h3>
+        <ul>
+          <li><strong>Token Ring Simulation:</strong> Observe token-based access control</li>
+          <li><strong>Ring Healing:</strong> See how the network handles node failures</li>
+          <li><strong>Load Testing:</strong> Test network performance under load</li>
+          <li><strong>Collision Detection:</strong> Monitor packet collisions</li>
+        </ul>
+
+        <button id="startDemo" class="jarvis-btn">Start Demo Sequence</button>
+      </div>    </div>
+    
+    <div class="main-layout">
+      <div class="status-container">
+        <div id="ringStatus" class="status-box">
+          <h3>RING TOPOLOGY OPERATIONAL</h3>
+          <div class="status-details" id="status">NODES: 6/6 | TOKEN: 🟢 ACTIVE | HEALTH: 100%</div>
+        </div>
+        <div id="packetStatusBox" class="status-box">
+          <h3>PACKET STATUS</h3>
+          <div class="status-details" id="packetStatus">PACKET TRANSMISSION - STANDBY</div>
+        </div>
+        <div id="activityBox" class="status-box">
+          <h3>ACTIVITY LOG</h3>
+          <div id="packetLog" class="log-container"></div>
+        </div>
+      </div>      <div class="main-content">
+        <div id="network"></div>
+        <button id="showGuide" class="jarvis-btn show-guide">📚 User Guide</button>
+      </div>
+      <div class="sidebar">
+        <div class="jarvis-header">
+          <h1>J.A.R.V.I.S.</h1>
+          <div class="subtitle">Jeremiah's Advanced Ring Visualization Interface Simulator</div>
+
+        </div>
+        
+        <!-- Network Controls -->
+        <div class="control-panel">
+          <h2>Network Controls</h2>
+          <button id="resetNetwork" class="jarvis-btn">Reset Network</button>
+          <button id="addNode" class="jarvis-btn">Add Node</button>
+          <button id="removeNode" class="jarvis-btn danger">Remove Node</button>
+          <button id="simulateFailure" class="jarvis-btn danger">Simulate Failure</button>
+        </div>
+
+        <!-- Token Control -->
+        <div class="control-panel token-control">
+          <h3>Token Ring Control</h3>
+          <button id="startToken" class="jarvis-btn success">Start Token</button>
+          <button id="stopToken" class="jarvis-btn danger">Stop Token</button>
+          <button id="checkRingHealth" class="jarvis-btn">Ring Diagnostics</button>
+        </div>
+        
+        <!-- Packet Controls -->
+        <div class="control-panel">
+          <h2>Packet Transmission</h2>
+          
+          <div class="packet-mode">
+            <label><input type="radio" name="packetMode" value="unicast" checked> Unicast</label>
+            <label><input type="radio" name="packetMode" value="broadcast"> Broadcast</label>
+          </div>
+          
+          <select id="sourceNode" class="jarvis-select">
+            <option value="">Select Source Node</option>
+          </select>
+          
+          <select id="targetNode" class="jarvis-select">
+            <option value="">Select Target Node</option>
+          </select>
+          
+          <button id="sendPacket" class="jarvis-btn">Send Packet</button>
+          <button id="autoSimulate" class="jarvis-btn">Auto Simulate</button>
+        </div>
+
+        <!-- Configuration Panel -->
+        <div class="control-panel">
+          <h2>Configuration</h2>
+          <div class="config-item">
+            <label for="latencySlider">Network Latency: <span id="latencyValue">50ms</span></label>
+            <input type="range" id="latencySlider" class="jarvis-slider" min="0" max="500" value="50" step="10">
+          </div>
+          
+          <div class="config-item">
+            <label for="packetSizeSlider">Packet Size: <span id="packetSizeValue">64 bytes</span></label>
+            <input type="range" id="packetSizeSlider" class="jarvis-slider" min="64" max="1500" value="64" step="64">
+          </div>
+          
+          <div class="config-item">
+            <label>
+              <input type="checkbox" id="enableCollisions" checked> Enable Collision Detection
+            </label>
+          </div>
+        </div>
+
+        <!-- Load Testing -->
+        <div class="control-panel">
+          <h2>Load Testing</h2>          <div class="config-item">
+            <label for="loadTestPackets">Number of Packets:</label>
+            <input type="number" id="loadTestPackets" class="jarvis-input" value="50" min="1" max="500">
+          </div>
+          <div class="button-group">
+            <button id="runLoadTest" class="jarvis-btn">Run Load Test</button>
+            <button id="stopLoadTest" class="jarvis-btn danger" disabled>Stop Test</button>
+          </div>
+          
+          <div id="loadTestResults" class="load-test-results" style="display: none;">
+            <h4>Load Test Results</h4>
+            <div class="metric">Packets Sent: <span id="packetsSent">0</span></div>
+            <div class="metric">Packets Delivered: <span id="packetsDelivered">0</span></div>
+            <div class="metric">Success Rate: <span id="successRate">0%</span></div>
+            <div class="metric">Avg Delivery Time: <span id="avgDeliveryTime">0ms</span></div>
+            <div class="metric">Collisions: <span id="collisionCount">0</span></div>
+          </div>
+        </div>
+
+        <!-- Network Analysis -->
+        <div class="control-panel">
+          <h2>Network Analysis</h2>
+          <button id="analyzeNetwork" class="jarvis-btn">Analyze Network</button>
+          <button id="exportDiagnostics" class="jarvis-btn">Export Diagnostics</button>
+          <button id="showStats" class="jarvis-btn">Network Statistics</button>
+          <button id="clearLogs" class="jarvis-btn danger">Clear Logs</button>
+        </div>        <!-- Network Legend -->
+        <div class="legend">
+          <h3>Legend</h3>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #00d4ff; border-color: #00d4ff;"></div>
+            <span>Active Node</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #ff4444; border-color: #ff4444;"></div>
+            <span>Inactive Node</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #00d4ff; border-color: #00d4ff; opacity: 0.3;"></div>
+            <span>Active Connection</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #ff4444; border-color: #ff4444; opacity: 0.3;"></div>
+            <span>Broken Connection</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #ffaa00; border-color: #ffaa00;"></div>
+            <span>Token</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript files -->
+    <script defer src="js/ring-config.js"></script>
+    <script defer src="js/ring-network-graph.js"></script>
+    <script defer src="js/ring-network-logic.js"></script>
+    <script defer src="js/ring-packet-simulation.js"></script>
+    <script defer src="js/ring-ui-handlers.js"></script>
+    <script defer src="js/ring-simulation.js"></script>
+    <script defer src="js/ring-main.js"></script>
+  </body>
+</html>
